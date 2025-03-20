@@ -1,54 +1,30 @@
-# React + TypeScript + Vite
+# Vintage Macintosh 3D Viewer
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Overview
+This project uses [React Three Fiber](https://github.com/pmndrs/react-three-fiber) and [Drei](https://github.com/pmndrs/drei) to create a 3D model of a vintage Macintosh computer. The 3D model acts as an outer shell that embeds a mock Macintosh OS website via an `<iframe>`, simulating an interactive vintage computing experience.
 
-Currently, two official plugins are available:
+## Features
+- **3D Vintage Macintosh Model**: Built using Three.js via React Three Fiber.
+- **Embedded Mock Macintosh OS**: Uses an `<iframe>` to display an external site that mimics an old Macintosh operating system.
+- **Interactive Camera Controls**: Drei’s camera controls.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-## Expanding the ESLint configuration
+## Usage
+- Rotate and zoom the 3D model using mouse or touch gestures.
+- Click on the Macintosh screen area to interact with the embedded mock OS.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Installation
+1. Run `pnpm install` to install dependencies.
+2. Run `pnpm dev` to start the development server.
+3. Open `http://localhost:5173` in your browser.
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+## Demo
+[Live Demo](https://diao1v.me)
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Acknowledgements
+- Thanks [@henryjeff](https://github.com/henryjeff) for inspiring me with the idea.
+- Thanks [@Darren.Hogan](https://sketchfab.com/Darren.Hogan) for providing the Macintosh 128K Computer (1984) model.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+## Future Enhancements
+- Optimize assets loading for better user expierence.
+- Improve screen reflections for added realism.
