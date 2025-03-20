@@ -1,18 +1,39 @@
-import { useGLTF, Html } from '@react-three/drei';
-import { useEffect } from 'react';
+import { Html } from '@react-three/drei';
+import { useEffect, useState, useRef } from 'react';
 import * as THREE from 'three';
 import { useMacintoshControls, useScreenControls } from './Controls';
+import { preloadedAssets } from '../utils/preload';
+import { Group } from 'three';
 
 export default function MacintoshModel() {
-  const macintosh = useGLTF('./models/macintosh.glb');
+  const [model, setModel] = useState<Group | null>(null);
+  const [smudgesDataUrl, setSmudgesDataUrl] = useState('');
   const { macX, macY, macZ, macRotationX } = useMacintoshControls();
   const { iframeX, iframeY, iframeZ, iframeXRotation, distanceFactor } =
     useScreenControls();
+  const imageRef = useRef(null);
 
   useEffect(() => {
-    if (macintosh.scene) {
+    // Use preloaded model
+    preloadedAssets.macintosh.then((gltf) => setModel(gltf.scene));
+
+    // Use preloaded smudges texture
+    preloadedAssets.smudges.then((texture) => {
+      const canvas = document.createElement('canvas');
+      canvas.width = texture.image.width;
+      canvas.height = texture.image.height;
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.drawImage(texture.image, 0, 0);
+        setSmudgesDataUrl(canvas.toDataURL('image/png'));
+      }
+    });
+  }, []);
+
+  useEffect(() => {
+    if (model) {
       // Find the screen mesh
-      macintosh.scene.traverse((child) => {
+      model.traverse((child) => {
         if (
           child.name === 'Computer_Screen_0' ||
           child.name.includes('Screen')
@@ -32,11 +53,13 @@ export default function MacintoshModel() {
         }
       });
     }
-  }, [macintosh.scene]);
+  }, [model]);
+
+  if (!model || !smudgesDataUrl) return null;
 
   return (
     <primitive
-      object={macintosh.scene}
+      object={model}
       position={[macX, macY, macZ]}
       rotation-x={macRotationX}
     >
@@ -51,9 +74,11 @@ export default function MacintoshModel() {
           <iframe src='https://os.diao1v.me' className='z-10 relative ' />
           <div className='absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none z-999'>
             <img
-              src='./textures/monitor/smudges.png'
+              ref={imageRef}
+              src={smudgesDataUrl}
               alt=''
               className='scale-101'
+              crossOrigin='anonymous'
             />
           </div>
         </div>
