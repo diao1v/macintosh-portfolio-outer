@@ -3,7 +3,7 @@ import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
 import { GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 import macintoshModel from '../assets/models/macintosh.glb';
-import smudgesImage from '../assets/textures/monitor/smudges.png';
+import smudgesImage from '../assets/textures/monitor/smudges.jpg';
 import hdrBackground from '../assets/textures/background/kloofendal_48d_partly_cloudy_puresky_1k.hdr';
 
 const textureLoader = new THREE.TextureLoader();
