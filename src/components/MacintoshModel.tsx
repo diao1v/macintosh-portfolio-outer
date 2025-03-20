@@ -71,7 +71,10 @@ export default function MacintoshModel() {
         rotation-x={iframeXRotation}
       >
         <div className='relative w-full h-full'>
-          <iframe src='https://os.diao1v.me' className='z-10 relative ' />
+          <iframe
+            src={import.meta.env.VITE_IFRAME_WEBSITE}
+            className='z-10 relative '
+          />
           <div className='absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none z-999'>
             <img
               ref={imageRef}
