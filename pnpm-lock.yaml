@@ -17,9 +17,6 @@ importers:
       '@tailwindcss/vite':
         specifier: ^4.0.14
         version: 4.0.14(vite@6.2.2(jiti@2.4.2)(lightningcss@1.29.2))
-      ldrs:
-        specifier: ^1.1.2
-        version: 1.1.2
       leva:
         specifier: ^0.10.0
         version: 0.10.0(@types/react@19.0.11)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
@@ -1244,9 +1241,6 @@ packages:
 
   keyv@4.5.4:
     resolution: {integrity: sha512-oxVHkHR/EJf2CNXnWxRLW6mg7JyCCUcG0DtEGmL2ctUo1PNTin1PUil+r/+4r5MpVgC/fn1kjsx7mjSujKqIpw==}
-
-  ldrs@1.1.2:
-    resolution: {integrity: sha512-Szurh/3n8C1UZAPFKZ+1gXOuEunkzcmbao3GHZKwmxwzNzPuPIY4Zubtue2TIswdVN9amre6NwqAdaJIPHHkzQ==}
 
   leva@0.10.0:
     resolution: {integrity: sha512-RiNJWmeqQdKIeHuVXgshmxIHu144a2AMYtLxKf8Nm1j93pisDPexuQDHKNdQlbo37wdyDQibLjY9JKGIiD7gaw==}
@@ -2929,8 +2923,6 @@ snapshots:
   keyv@4.5.4:
     dependencies:
       json-buffer: 3.0.1
-
-  ldrs@1.1.2: {}
 
   leva@0.10.0(@types/react@19.0.11)(react-dom@19.0.0(react@19.0.0))(react@19.0.0):
     dependencies:
