@@ -1,13 +1,48 @@
 import { PresentationControls } from '@react-three/drei';
-import SceneLighting from './SceneLighting';
 import EnvironmentSetup from './EnvironmentSetup';
 import MacintoshModel from './MacintoshModel';
 import GlassTable from './GlassTable';
+import gsap from 'gsap';
+import { useEffect, useLayoutEffect, useState } from 'react';
+import { useThree } from '@react-three/fiber';
+import { preloadedAssets } from '../utils/preload';
 
 export default function World() {
+  const { camera } = useThree();
+  const [hdrLoaded, setHdrLoaded] = useState(false);
+
+  useLayoutEffect(() => {
+    camera.position.set(0, 0, 100);
+    camera.lookAt(0, 0, 0);
+    camera.updateProjectionMatrix();
+  }, [camera]);
+
+  useEffect(() => {
+    preloadedAssets.hdr.then(() => {
+      setHdrLoaded(true);
+    });
+  }, []);
+
+  useEffect(() => {
+    const animationTimeout = setTimeout(() => {
+      gsap.to(camera.position, {
+        x: 0,
+        y: 0,
+        z: 5,
+        duration: 5,
+        ease: 'expo.out',
+        onUpdate: () => {
+          camera.lookAt(0, 0, 0);
+          camera.updateProjectionMatrix();
+        },
+      });
+    }, 100);
+
+    return () => clearTimeout(animationTimeout);
+  }, [camera]);
+
   return (
     <>
-      <SceneLighting />
       <EnvironmentSetup />
       <PresentationControls
         global
@@ -18,7 +53,7 @@ export default function World() {
         cursor={true}
       >
         <MacintoshModel />
-        <GlassTable />
+        {hdrLoaded && <GlassTable />}
       </PresentationControls>
     </>
   );

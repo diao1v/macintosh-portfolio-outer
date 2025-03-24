@@ -20,7 +20,12 @@ function App() {
       {!assetsLoaded ? (
         <LoadingScreen />
       ) : (
-        <Canvas>
+        <Canvas 
+          camera={{ 
+            position: [0, 0, 100], 
+            fov: 75 
+          }}
+        >
           <World />
         </Canvas>
       )}
