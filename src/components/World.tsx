@@ -6,7 +6,6 @@ import gsap from 'gsap';
 import { useEffect, useLayoutEffect, useState } from 'react';
 import { useThree } from '@react-three/fiber';
 import { preloadedAssets } from '../utils/preload';
-import SceneLighting from './SceneLighting';
 
 export default function World() {
   const { camera } = useThree();
@@ -44,7 +43,6 @@ export default function World() {
 
   return (
     <>
-      {hdrLoaded ? <SceneLighting /> : null}
       <EnvironmentSetup />
       <PresentationControls
         global
