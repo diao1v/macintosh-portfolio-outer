@@ -44,7 +44,7 @@ export default function World() {
 
   return (
     <>
-      {hdrLoaded ? <SceneLighting /> : null}
+      <SceneLighting />
       <EnvironmentSetup />
       <PresentationControls
         global
