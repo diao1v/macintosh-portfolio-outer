@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { allAssetsLoaded } from '../utils/preload';
 
-const LoadingScreen = () => {
+
+export function LoadingScreen() {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
@@ -33,6 +34,4 @@ const LoadingScreen = () => {
       </div>
     </div>
   );
-};
-
-export default LoadingScreen;
+}
