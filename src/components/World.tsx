@@ -1,11 +1,12 @@
-import { PresentationControls } from '@react-three/drei';
-import EnvironmentSetup from './EnvironmentSetup';
-import MacintoshModel from './MacintoshModel';
-import GlassTable from './GlassTable';
-import gsap from 'gsap';
 import { useEffect, useLayoutEffect, useState } from 'react';
 import { useThree } from '@react-three/fiber';
+import { PresentationControls } from '@react-three/drei';
+import gsap from 'gsap';
+import GlassTable from './GlassTable';
+import EnvironmentSetup from './EnvironmentSetup';
+import MacintoshModel from './MacintoshModel';
 import { preloadedAssets } from '../utils/preload';
+import SceneLighting from './SceneLighting';
 
 export default function World() {
   const { camera } = useThree();
@@ -43,6 +44,7 @@ export default function World() {
 
   return (
     <>
+      <SceneLighting />
       <EnvironmentSetup />
       <PresentationControls
         global
