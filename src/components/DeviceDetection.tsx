@@ -46,7 +46,7 @@ const DeviceDetection: React.FC<DeviceDetectionProps> = ({
             <img
               src='/macintosh.png'
               alt='Macintosh'
-              className='w-20 h-20 mx-auto'
+              className='w-10 mx-auto'
             />
           </div>
           <p className='mb-4'>
