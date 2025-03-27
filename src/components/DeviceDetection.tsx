@@ -71,10 +71,10 @@ const DeviceDetection: React.FC<DeviceDetectionProps> = ({
         <div className='max-w-md text-center'>
           <h1 className='text-2xl font-bold mb-4'>Window Too Small</h1>
           <div className='mb-4'>
-            <img
-              src='/assets/images/macintosh-icon.png'
+          <img
+              src='/macintosh.png'
               alt='Macintosh'
-              className='w-20 h-20 mx-auto'
+              className='w-10 mx-auto'
             />
           </div>
           <p className='mb-4'>
