@@ -1,7 +1,8 @@
-import { Canvas } from '@react-three/fiber';
-import World from './components/World';
 import { useEffect, useState } from 'react';
+import { Canvas } from '@react-three/fiber';
 import { allAssetsLoaded } from './utils/preload';
+import World from './components/World';
+import DeviceDetection from './components/DeviceDetection';
 import { LoadingScreen } from './components/LoadingScreen';
 import HelpIcon from './components/Help/HelpIcon';
 
@@ -17,7 +18,7 @@ function App() {
   }, []);
 
   return (
-    <>
+    <DeviceDetection>
       {!assetsLoaded ? (
         <LoadingScreen />
       ) : (
@@ -31,7 +32,7 @@ function App() {
         </Canvas>
       )}
       {assetsLoaded ? <HelpIcon position='bottom-right' /> : null}
-    </>
+    </DeviceDetection>
   );
 }
 
