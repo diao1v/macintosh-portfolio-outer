@@ -6,7 +6,9 @@ import HintText from './HintText';
 
 const GAP_FOR_QUESTION_MARK = 50;
 const GAP_FOR_BUBBLE = 20;
-const INITIAL_VISIBILITY_DURATION = 8000;
+const INITIAL_VISIBILITY_DURATION = 1000;
+const JUMP_INTERVAL = 3000; 
+const JUMP_DURATION = 800; 
 
 interface HelpIconProps {
   position?: 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left';
@@ -25,21 +27,58 @@ const HelpIcon: React.FC<HelpIconProps> = ({
 }) => {
   const [showHint, setShowHint] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
-  const [isInitiallyVisible, setIsInitiallyVisible] = useState(true);
+  const [isFullyVisible, setIsFullyVisible] = useState(true);
   const [portalContainer, setPortalContainer] = useState<HTMLElement | null>(
     null
   );
+  const [hasBeenClicked, setHasBeenClicked] = useState(false);
+  const [isJumping, setIsJumping] = useState(false);
 
   const iconRef = useRef<HTMLDivElement>(null);
   const bubbleRef = useRef<HTMLDivElement>(null);
 
+  // Add jump animation keyframes
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsInitiallyVisible(false);
-    }, INITIAL_VISIBILITY_DURATION);
+    const styleElement = document.createElement('style');
+    styleElement.innerHTML = `
+      @keyframes helpIconJump {
+      0%, 100% { transform: translateY(0); }
+      20% { transform: translateY(-20px); }
+      40% { transform: translateY(0); }
+      60% { transform: translateY(-15px); }
+      80% { transform: translateY(0); }
+      }
+    `;
+    document.head.appendChild(styleElement);
 
-    return () => clearTimeout(timer);
+    return () => {
+      document.head.removeChild(styleElement);
+    };
   }, []);
+
+  useEffect(() => {
+    if (hasBeenClicked) {
+      const timer = setTimeout(() => {
+        setIsFullyVisible(false);
+      }, INITIAL_VISIBILITY_DURATION);
+
+      return () => clearTimeout(timer);
+    }
+  }, [hasBeenClicked]);
+
+  useEffect(() => {
+    if (showHint || hasBeenClicked) return; 
+
+    const jumpInterval = setInterval(() => {
+      setIsJumping(true);
+
+      setTimeout(() => {
+        setIsJumping(false);
+      }, JUMP_DURATION);
+    }, JUMP_INTERVAL);
+
+    return () => clearInterval(jumpInterval);
+  }, [showHint, hasBeenClicked]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -145,7 +184,7 @@ const HelpIcon: React.FC<HelpIconProps> = ({
       <div
         ref={iconRef}
         className={`fixed pointer-events-auto cursor-pointer bg-no-repeat bg-contain transition-opacity duration-300 ${
-          showHint || isHovered || isInitiallyVisible
+          showHint || isHovered || !hasBeenClicked || isFullyVisible
             ? 'opacity-100'
             : 'opacity-30'
         }`}
@@ -154,8 +193,16 @@ const HelpIcon: React.FC<HelpIconProps> = ({
           height: `${iconSize}px`,
           backgroundImage: `url(${questionMarkImage})`,
           ...getIconPositionStyle(),
+          ...(isJumping
+            ? {
+                animation: 'helpIconJump 0.5s ease-in-out',
+              }
+            : {}),
         }}
-        onClick={() => setShowHint(!showHint)}
+        onClick={() => {
+          setShowHint(!showHint);
+          setHasBeenClicked(true);
+        }}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         aria-label='Help'
