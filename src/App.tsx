@@ -19,18 +19,17 @@ function App() {
 
   return (
     <DeviceDetection>
-      {!assetsLoaded ? (
-        <LoadingScreen />
-      ) : (
-        <Canvas
-          camera={{
-            position: [0, 0, 100],
-            fov: 75,
-          }}
-        >
-          <World />
-        </Canvas>
-      )}
+      {/* Canvas always mounts so the scene renders behind the loading screen.
+          By the time the loading overlay is removed, the sky and model are ready. */}
+      <Canvas
+        camera={{
+          position: [0, 0, 100],
+          fov: 75,
+        }}
+      >
+        <World started={assetsLoaded} />
+      </Canvas>
+      {!assetsLoaded ? <LoadingScreen /> : null}
       {assetsLoaded ? <HelpIcon position='bottom-right' /> : null}
     </DeviceDetection>
   );

@@ -8,7 +8,7 @@ import MacintoshModel from './MacintoshModel';
 import { preloadedAssets } from '../utils/preload';
 import SceneLighting from './SceneLighting';
 
-export default function World() {
+export default function World({ started }: { started: boolean }) {
   const { camera } = useThree();
   const [hdrLoaded, setHdrLoaded] = useState(false);
 
@@ -25,6 +25,10 @@ export default function World() {
   }, []);
 
   useEffect(() => {
+    // Only run the fly-in once loading is done, so it plays as the reveal
+    // instead of being wasted behind the loading screen.
+    if (!started) return;
+
     const animationTimeout = setTimeout(() => {
       gsap.to(camera.position, {
         x: 0,
@@ -40,7 +44,7 @@ export default function World() {
     }, 100);
 
     return () => clearTimeout(animationTimeout);
-  }, [camera]);
+  }, [camera, started]);
 
   return (
     <>
@@ -54,7 +58,7 @@ export default function World() {
         snap={true}
         cursor={true}
       >
-        <MacintoshModel />
+        <MacintoshModel started={started} />
         {hdrLoaded ? <GlassTable /> : null}
       </PresentationControls>
     </>

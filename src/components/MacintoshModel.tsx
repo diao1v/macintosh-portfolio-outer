@@ -5,7 +5,7 @@ import { useMacintoshControls, useScreenControls } from './Controls';
 import { preloadedAssets } from '../utils/preload';
 import { Group } from 'three';
 
-export default function MacintoshModel() {
+export default function MacintoshModel({ started }: { started: boolean }) {
   const [model, setModel] = useState<Group | null>(null);
   const [smudgesDataUrl, setSmudgesDataUrl] = useState('');
   const { macX, macY, macZ, macRotationX } = useMacintoshControls();
@@ -63,29 +63,34 @@ export default function MacintoshModel() {
       position={[macX, macY, macZ]}
       rotation-x={macRotationX}
     >
-      <Html
-        transform
-        wrapperClass='htmlScreen'
-        distanceFactor={distanceFactor}
-        position={[iframeX, iframeY, iframeZ]}
-        rotation-x={iframeXRotation}
-      >
-        <div className='relative w-full h-full'>
-          <iframe
-            src={import.meta.env.VITE_IFRAME_WEBSITE}
-            className='z-10 relative '
-          />
-          <div className='absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none z-999'>
-            <img
-              ref={imageRef}
-              src={smudgesDataUrl}
-              alt=''
-              className='scale-101'
-              crossOrigin='anonymous'
+      {/* Drei's <Html> projects the iframe on top of the canvas with a very high
+          z-index, so it would punch through the loading overlay. Only mount it
+          once loading is done, when the model + sky are revealed. */}
+      {started ? (
+        <Html
+          transform
+          wrapperClass='htmlScreen'
+          distanceFactor={distanceFactor}
+          position={[iframeX, iframeY, iframeZ]}
+          rotation-x={iframeXRotation}
+        >
+          <div className='relative w-full h-full'>
+            <iframe
+              src={import.meta.env.VITE_IFRAME_WEBSITE}
+              className='z-10 relative '
             />
+            <div className='absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none z-999'>
+              <img
+                ref={imageRef}
+                src={smudgesDataUrl}
+                alt=''
+                className='scale-101'
+                crossOrigin='anonymous'
+              />
+            </div>
           </div>
-        </div>
-      </Html>
+        </Html>
+      ) : null}
     </primitive>
   );
 }
