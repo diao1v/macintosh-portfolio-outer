@@ -6,7 +6,7 @@ import DeviceDetection from './components/DeviceDetection';
 import { LoadingScreen } from './components/LoadingScreen';
 import HelpIcon from './components/Help/HelpIcon';
 import ModeToggle from './components/ModeToggle';
-import { TO_1984, TO_2084, type Mode } from './types/mode';
+import { SWITCH, type Mode } from './types/mode';
 
 function App() {
   const [assetsLoaded, setAssetsLoaded] = useState(false);
@@ -25,7 +25,7 @@ function App() {
     const next: Mode = mode === '1984' ? '2084' : '1984';
     setMode(next);
     setSwitching(true);
-    setTimeout(() => setSwitching(false), next === '2084' ? TO_2084.done : TO_1984.done);
+    setTimeout(() => setSwitching(false), SWITCH.done);
   };
 
   return (

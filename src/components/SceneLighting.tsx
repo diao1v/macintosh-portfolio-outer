@@ -2,7 +2,8 @@ import { useThree } from '@react-three/fiber';
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import gsap from 'gsap';
-import { TO_1984, TO_2084, type Mode } from '../types/mode';
+import { preloadedAssets } from '../utils/preload';
+import { SWITCH, type Mode } from '../types/mode';
 
 const DAY = {
   ambient: { color: '#c4d7ff', intensity: 1.5 },
@@ -25,11 +26,13 @@ const NIGHT = {
   cyan: { color: '#19e6ff', intensity: 500 },
 };
 
-const NIGHT_BG = '#0a0514';
+const NIGHT_BG = new THREE.Color('#0a0514');
+const BLACK = new THREE.Color('#000000');
 
-type Lights = Record<keyof typeof DAY, THREE.Light | null>;
+type Key = keyof typeof DAY;
+type Lights = Record<Key, THREE.Light | null>;
+const KEYS = Object.keys(DAY) as Key[];
 
-/** Tween one light toward a target colour and intensity. */
 function tweenLight(light: THREE.Light | null, to: { color: string; intensity: number }, duration: number, delay = 0) {
   if (!light) return;
   gsap.to(light, { intensity: to.intensity, duration, delay, ease: 'power2.out' });
@@ -41,11 +44,11 @@ function flickerOn(light: THREE.Light | null, intensity: number, delay: number) 
   if (!light) return;
   gsap.to(light, {
     keyframes: [
-      { intensity: intensity, duration: 0.05 },
+      { intensity, duration: 0.05 },
       { intensity: 0, duration: 0.08 },
       { intensity: intensity * 0.7, duration: 0.05 },
       { intensity: 0, duration: 0.12 },
-      { intensity: intensity, duration: 0.05 },
+      { intensity, duration: 0.05 },
     ],
     delay,
   });
@@ -54,37 +57,48 @@ function flickerOn(light: THREE.Light | null, intensity: number, delay: number) 
 export default function SceneLighting({ mode }: { mode: Mode }) {
   const { scene } = useThree();
   const lights = useRef<Lights>({ ambient: null, main: null, fill: null, rim: null, spot: null, magenta: null, cyan: null });
+  const hdr = useRef<THREE.Texture | null>(null);
   const first = useRef(true);
 
+  // The sky is managed here, not by <Environment>, so it can go black on cue.
   useEffect(() => {
-    const l = lights.current;
-    const bg = new THREE.Color(NIGHT_BG);
+    preloadedAssets.hdr.then((texture) => {
+      hdr.current = texture;
+      if (mode === '1984') scene.background = texture;
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scene]);
+
+  useEffect(() => {
     if (first.current) {
       first.current = false;
       return;
     }
+    const l = lights.current;
+    const off = SWITCH.lightsOff / 1000;
+    const on = SWITCH.lightsOn / 1000;
+
+    // Lights off, sky black.
+    const from = mode === '2084' ? DAY : NIGHT;
+    KEYS.forEach((k) => tweenLight(l[k], { ...from[k], intensity: 0 }, 0.4, off));
+    gsap.delayedCall(off, () => {
+      scene.background = BLACK.clone();
+    });
+
+    // New lights on.
     if (mode === '2084') {
-      const s = TO_2084;
-      (Object.keys(DAY) as (keyof typeof DAY)[]).forEach((k) => tweenLight(l[k], { ...DAY[k], intensity: 0 }, s.blackout / 1000));
-      scene.background = new THREE.Color('#000000');
-      flickerOn(l.cyan, NIGHT.cyan.intensity, s.cyanOn / 1000);
-      flickerOn(l.magenta, NIGHT.magenta.intensity, s.magentaOn / 1000);
-      const rise = s.magentaOn / 1000;
-      tweenLight(l.ambient, NIGHT.ambient, 1.5, rise);
-      tweenLight(l.fill, NIGHT.fill, 1.5, rise);
-      tweenLight(l.spot, NIGHT.spot, 1.5, rise);
-      gsap.to(scene.background as THREE.Color, { r: bg.r, g: bg.g, b: bg.b, duration: 1.5, delay: rise });
+      flickerOn(l.cyan, NIGHT.cyan.intensity, on);
+      flickerOn(l.magenta, NIGHT.magenta.intensity, on + 0.4);
+      (['ambient', 'fill', 'spot'] as const).forEach((k) => tweenLight(l[k], NIGHT[k], 1.5, on + 0.4));
+      gsap.delayedCall(on + 0.4, () => {
+        if (scene.background instanceof THREE.Color) gsap.to(scene.background, { ...NIGHT_BG, duration: 1.5 });
+      });
     } else {
-      const s = TO_1984;
-      tweenLight(l.cyan, { ...NIGHT.cyan, intensity: 0 }, s.neonOff / 1000);
-      tweenLight(l.magenta, { ...NIGHT.magenta, intensity: 0 }, s.neonOff / 1000);
-      (['ambient', 'fill', 'spot'] as const).forEach((k) => tweenLight(l[k], { ...NIGHT[k], intensity: 0 }, 0.2));
-      gsap.to(scene.background as THREE.Color, { r: 0, g: 0, b: 0, duration: 0.2 });
-      const up = s.daylight / 1000;
-      (Object.keys(DAY) as (keyof typeof DAY)[]).forEach((k) => tweenLight(l[k], DAY[k], 1, up));
-      // EnvironmentSetup puts the HDR sky back once its `background` prop flips; clear ours so it can.
-      gsap.delayedCall(up, () => {
-        scene.background = null;
+      KEYS.forEach((k) => tweenLight(l[k], DAY[k], 1.0, on));
+      gsap.delayedCall(on, () => {
+        scene.background = hdr.current;
+        scene.backgroundIntensity = 0;
+        gsap.to(scene, { backgroundIntensity: 1, duration: 1.0 });
       });
     }
   }, [mode, scene]);

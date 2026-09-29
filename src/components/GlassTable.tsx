@@ -22,10 +22,10 @@ export default function GlassTable({ mode }: { mode: Mode }) {
         reflectivity={0.2}
         clearcoat={1}
         clearcoatRoughness={0.05}
-        // Transmission renders the scene behind the glass in a separate pass that blacks out
-        // the post-processing composer when the table fills the view. 2084 uses plain dark glass.
-        transmission={mode === '1984' ? 0.95 : 0}
-        color={mode === '1984' ? '#ffffff' : '#0b0716'}
+        // No transmission: its separate render pass blacks out the post-processing composer
+        // whenever the table fills the view. Tinted reflective glass reads the same from the screen.
+        transmission={0}
+        color={mode === '1984' ? '#dfe9f5' : '#0b0716'}
         ior={0.9}
       />
     </Box>

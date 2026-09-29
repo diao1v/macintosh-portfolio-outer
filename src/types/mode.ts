@@ -1,5 +1,8 @@
 export type Mode = '1984' | '2084';
 
-/** Transition schedule in ms, shared by lights, model, screen and effects. */
-export const TO_2084 = { pullBack: 0, blackout: 400, cyanOn: 1200, magentaOn: 1600, flyIn: 2400, glitch: 2600, done: 4000 } as const;
-export const TO_1984 = { pullBack: 0, neonOff: 100, daylight: 1000, flyIn: 1400, glitch: 1600, done: 3000 } as const;
+/**
+ * Transition schedule in ms, identical in both directions:
+ * screen shuts down and the camera pulls back → lights off → new lights on →
+ * camera flies back in → screen boots the new system.
+ */
+export const SWITCH = { pullBack: 0, lightsOff: 1200, lightsOn: 2000, flyIn: 3200, boot: 3600, done: 5000 } as const;

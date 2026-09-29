@@ -5,7 +5,7 @@ import gsap from 'gsap';
 import { useMacintoshControls, useScreenControls } from './Controls';
 import { preloadedAssets } from '../utils/preload';
 import { Group } from 'three';
-import { TO_1984, TO_2084, type Mode } from '../types/mode';
+import { SWITCH, type Mode } from '../types/mode';
 
 const SITES: Record<Mode, string> = {
   '1984': import.meta.env.VITE_IFRAME_WEBSITE,
@@ -73,7 +73,8 @@ export default function MacintoshModel({ started, mode }: { started: boolean; mo
     });
   }, [model]);
 
-  // Mode transition: case materials and the screen follow the shared schedule.
+  // Mode transition: the screen shuts down at once; the case relights with the new lights;
+  // the screen boots the new system after the camera is back in.
   useEffect(() => {
     if (first.current) {
       first.current = false;
@@ -82,30 +83,19 @@ export default function MacintoshModel({ started, mode }: { started: boolean; mo
     const timers: ReturnType<typeof setTimeout>[] = [];
     const at = (ms: number, fn: () => void) => timers.push(setTimeout(fn, ms));
     setScreen('black');
-    if (mode === '2084') {
-      const s = TO_2084;
-      caseMaterials.current.forEach((_, m) => {
-        gsap.to(m.color, { ...CASE_NIGHT.color, duration: 1.5, delay: s.magentaOn / 1000 });
-        gsap.to(m.emissive, { ...CASE_NIGHT.emissive, duration: 1.5, delay: s.magentaOn / 1000 });
-        gsap.to(m, { emissiveIntensity: CASE_NIGHT.emissiveIntensity, duration: 1.5, delay: s.magentaOn / 1000 });
-      });
-      at(s.glitch, () => setScreen('glitch'));
-      at(s.glitch + GLITCH_MS / 2, () => {
-        setOracleMounted(true);
-        setSite('2084');
-      });
-      at(s.glitch + GLITCH_MS, () => setScreen('on'));
-    } else {
-      const s = TO_1984;
-      caseMaterials.current.forEach((day, m) => {
-        gsap.to(m.color, { ...day.color, duration: 1, delay: s.daylight / 1000 });
-        gsap.to(m.emissive, { ...day.emissive, duration: 1, delay: s.daylight / 1000 });
-        gsap.to(m, { emissiveIntensity: day.emissiveIntensity, duration: 1, delay: s.daylight / 1000 });
-      });
-      at(s.glitch, () => setScreen('glitch'));
-      at(s.glitch + GLITCH_MS / 2, () => setSite('1984'));
-      at(s.glitch + GLITCH_MS, () => setScreen('on'));
-    }
+    const on = SWITCH.lightsOn / 1000;
+    caseMaterials.current.forEach((day, m) => {
+      const to = mode === '2084' ? CASE_NIGHT : day;
+      gsap.to(m.color, { ...to.color, duration: 1.2, delay: on });
+      gsap.to(m.emissive, { ...to.emissive, duration: 1.2, delay: on });
+      gsap.to(m, { emissiveIntensity: to.emissiveIntensity, duration: 1.2, delay: on });
+    });
+    at(SWITCH.boot, () => setScreen('glitch'));
+    at(SWITCH.boot + GLITCH_MS / 2, () => {
+      if (mode === '2084') setOracleMounted(true);
+      setSite(mode);
+    });
+    at(SWITCH.boot + GLITCH_MS, () => setScreen('on'));
     return () => timers.forEach(clearTimeout);
   }, [mode]);
 

@@ -8,12 +8,14 @@ import MacintoshModel from './MacintoshModel';
 import { preloadedAssets } from '../utils/preload';
 import SceneLighting from './SceneLighting';
 import Effects from './Effects';
-import { TO_1984, TO_2084, type Mode } from '../types/mode';
+import { SWITCH, type Mode } from '../types/mode';
 
 export default function World({ started, mode }: { started: boolean; mode: Mode }) {
   const { camera } = useThree();
   const [hdrLoaded, setHdrLoaded] = useState(false);
-  const [effects, setEffects] = useState(false);
+  // `lit` is the palette currently on screen; it follows `mode` when the new lights come on.
+  const [lit, setLit] = useState<Mode>(mode);
+  const firstMode = useRef(true);
 
   useLayoutEffect(() => {
     camera.position.set(0, 0, 100);
@@ -27,32 +29,21 @@ export default function World({ started, mode }: { started: boolean; mode: Mode 
     });
   }, []);
 
-  // Bloom joins at the first neon flicker and leaves the instant neon cuts out.
-  useEffect(() => {
-    if (mode !== '2084') {
-      setEffects(false);
-      return;
-    }
-    const t = setTimeout(() => setEffects(true), TO_2084.cyanOn);
-    return () => clearTimeout(t);
-  }, [mode]);
-
-  // Camera choreography: pull back so the whole machine is in view for the blackout and
-  // the neon flicker, then fly back into the screen as it glitches on.
-  const firstMode = useRef(true);
+  // Mode switch: camera pulls back with the old lights, and flies back in after the new ones are on.
   useEffect(() => {
     if (firstMode.current) {
       firstMode.current = false;
       return;
     }
-    const s = mode === '2084' ? TO_2084 : TO_1984;
     const look = () => {
       camera.lookAt(0, 0, 0);
       camera.updateProjectionMatrix();
     };
     gsap.killTweensOf(camera.position);
-    gsap.to(camera.position, { z: 45, y: 4, duration: 1, delay: s.pullBack / 1000, ease: 'power2.inOut', onUpdate: look });
-    gsap.to(camera.position, { z: 5, y: 0, duration: 1.4, delay: s.flyIn / 1000, ease: 'expo.out', onUpdate: look });
+    gsap.to(camera.position, { z: 45, y: 4, duration: 1, delay: SWITCH.pullBack / 1000, ease: 'power2.inOut', onUpdate: look });
+    gsap.to(camera.position, { z: 5, y: 0, duration: 1.4, delay: SWITCH.flyIn / 1000, ease: 'expo.out', onUpdate: look });
+    const t = setTimeout(() => setLit(mode), SWITCH.lightsOn);
+    return () => clearTimeout(t);
   }, [mode, camera]);
 
   useEffect(() => {
@@ -80,12 +71,12 @@ export default function World({ started, mode }: { started: boolean; mode: Mode 
   return (
     <>
       <SceneLighting mode={mode} />
-      <EnvironmentSetup mode={mode} />
+      <EnvironmentSetup lit={lit} />
       <PresentationControls global polar={[-Math.PI / 4, Math.PI / 4]} azimuth={[-Math.PI / 4, Math.PI / 4]} zoom={1} snap={true} cursor={true}>
         <MacintoshModel started={started} mode={mode} />
-        {hdrLoaded ? <GlassTable mode={mode} /> : null}
+        {hdrLoaded ? <GlassTable mode={lit} /> : null}
       </PresentationControls>
-      <Effects active={effects} />
+      <Effects active={lit === '2084'} />
     </>
   );
 }
