@@ -40,7 +40,7 @@ export default function World({ started, mode }: { started: boolean; mode: Mode 
       camera.updateProjectionMatrix();
     };
     gsap.killTweensOf(camera.position);
-    gsap.to(camera.position, { z: 45, y: 4, duration: 1, delay: SWITCH.pullBack / 1000, ease: 'power2.inOut', onUpdate: look });
+    gsap.to(camera.position, { z: 45, y: 4, duration: 1.1, delay: SWITCH.pullBack / 1000, ease: 'power2.inOut', onUpdate: look });
     gsap.to(camera.position, { z: 5, y: 0, duration: 1.4, delay: SWITCH.flyIn / 1000, ease: 'expo.out', onUpdate: look });
     const t = setTimeout(() => setLit(mode), SWITCH.lightsOn);
     return () => clearTimeout(t);

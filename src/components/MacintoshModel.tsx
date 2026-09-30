@@ -24,7 +24,8 @@ export default function MacintoshModel({ started, mode }: { started: boolean; mo
   const [smudgesDataUrl, setSmudgesDataUrl] = useState('');
   const [site, setSite] = useState<Mode>('1984');
   const [oracleMounted, setOracleMounted] = useState(false);
-  const [screen, setScreen] = useState<'on' | 'black' | 'glitch'>('on');
+  // off: CRT power-off animation, picture collapses and stays dark. glitch: boot tear over the new site.
+  const [screen, setScreen] = useState<'on' | 'off' | 'glitch'>('on');
   const { macX, macY, macZ, macRotationX } = useMacintoshControls();
   const { iframeX, iframeY, iframeZ, iframeXRotation, distanceFactor } = useScreenControls();
   const imageRef = useRef(null);
@@ -82,7 +83,7 @@ export default function MacintoshModel({ started, mode }: { started: boolean; mo
     }
     const timers: ReturnType<typeof setTimeout>[] = [];
     const at = (ms: number, fn: () => void) => timers.push(setTimeout(fn, ms));
-    setScreen('black');
+    setScreen('off');
     const on = SWITCH.lightsOn / 1000;
     caseMaterials.current.forEach((day, m) => {
       const to = mode === '2084' ? CASE_NIGHT : day;
@@ -110,12 +111,14 @@ export default function MacintoshModel({ started, mode }: { started: boolean; mo
         <Html transform wrapperClass='htmlScreen' distanceFactor={distanceFactor} position={[iframeX, iframeY, iframeZ]} rotation-x={iframeXRotation}>
           <div className='relative w-full h-full'>
             {/* Both sites stay mounted once visited, so switching back does not reboot the OS. */}
-            <iframe src={SITES['1984']} className='z-10 relative' style={{ display: site === '1984' ? 'block' : 'none' }} />
-            {oracleMounted && <iframe src={SITES['2084']} className='z-10 relative' style={{ display: site === '2084' ? 'block' : 'none' }} />}
+            <div className={`relative z-10 ${screen === 'off' ? 'screen-off' : ''}`}>
+              <iframe src={SITES['1984']} className='relative' style={{ display: site === '1984' ? 'block' : 'none' }} />
+              {oracleMounted && <iframe src={SITES['2084']} className='relative' style={{ display: site === '2084' ? 'block' : 'none' }} />}
+            </div>
             <div className='absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none z-999'>
               <img ref={imageRef} src={smudgesDataUrl} alt='' className='scale-101' crossOrigin='anonymous' />
             </div>
-            {screen !== 'on' && <div className={`screen-cover ${screen === 'glitch' ? 'screen-cover--glitch' : ''}`} />}
+            {screen === 'glitch' && <div className='screen-cover screen-cover--glitch' />}
           </div>
         </Html>
       ) : null}

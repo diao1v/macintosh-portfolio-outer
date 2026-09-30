@@ -49,6 +49,18 @@ canvas {
   box-shadow: 0 0 10px #39ff14, 3px 3px 0 #0a3d0a;
 }
 
+/* CRT power-off: the picture squashes to a bright line, shrinks to a dot, and stays dark. */
+.screen-off {
+  animation: crt-off 0.5s ease-in forwards;
+  transform-origin: 50% 50%;
+}
+@keyframes crt-off {
+  0% { transform: scale(1, 1); filter: brightness(1); opacity: 1; }
+  45% { transform: scale(1, 0.012); filter: brightness(2.6); opacity: 1; }
+  80% { transform: scale(0.03, 0.012); filter: brightness(3); opacity: 1; }
+  100% { transform: scale(0, 0); filter: brightness(3); opacity: 0; }
+}
+
 .screen-cover {
   position: absolute;
   inset: 0;
