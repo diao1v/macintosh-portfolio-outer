@@ -8,6 +8,7 @@ import MacintoshModel from './MacintoshModel';
 import { preloadedAssets } from '../utils/preload';
 import SceneLighting from './SceneLighting';
 import Effects from './Effects';
+import NeonRig from './NeonRig';
 import { SWITCH, type Mode } from '../types/mode';
 
 export default function World({ started, mode }: { started: boolean; mode: Mode }) {
@@ -71,6 +72,7 @@ export default function World({ started, mode }: { started: boolean; mode: Mode 
   return (
     <>
       <SceneLighting mode={mode} />
+      <NeonRig mode={mode} />
       <EnvironmentSetup lit={lit} />
       <PresentationControls global polar={[-Math.PI / 4, Math.PI / 4]} azimuth={[-Math.PI / 4, Math.PI / 4]} zoom={1} snap={true} cursor={true}>
         <MacintoshModel started={started} mode={mode} />
