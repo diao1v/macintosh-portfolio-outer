@@ -10,7 +10,11 @@ const TUBES: { color: string; position: [number, number, number]; rotation: [num
   { color: '#8a3dff', position: [-22, -14, -30], rotation: [0, 0, Math.PI / 2], length: 22 },
   { color: '#39ff14', position: [24, -12, -32], rotation: [0, 0, Math.PI / 2], length: 22 },
   { color: '#ff7a1a', position: [0, 22, -36], rotation: [0, 0, Math.PI / 2], length: 30 },
-  { color: '#2b6bff', position: [0, -20, 20], rotation: [0, 0, Math.PI / 2], length: 26 },
+  { color: '#2b6bff', position: [0, -16, 24], rotation: [0, 0, Math.PI / 2], length: 26 },
+  // Front of the machine, either side of the camera path, so they sweep past during the fly-in.
+  { color: '#ff3b7f', position: [-24, -2, 20], rotation: [0, 0, 0.12], length: 16 },
+  { color: '#ffe600', position: [24, 0, 18], rotation: [0, 0, -0.15], length: 16 },
+  { color: '#19e6ff', position: [-14, 16, 26], rotation: [0, 0, Math.PI / 2], length: 12 },
 ];
 const GLOW = 6;
 const LIGHT = 260;
@@ -34,7 +38,7 @@ export default function NeonRig({ mode }: { mode: Mode }) {
       });
       TUBES.forEach((_, i) => {
         // Each tube ignites a beat after the last, with a stutter that bloom turns into a flash.
-        const delay = on + 0.15 + i * 0.14;
+        const delay = on + 0.15 + i * 0.11;
         const stutter = (peak: number) => [
           { v: peak, duration: 0.04 },
           { v: 0, duration: 0.07 },
