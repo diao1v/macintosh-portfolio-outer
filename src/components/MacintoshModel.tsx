@@ -101,6 +101,20 @@ export default function MacintoshModel({ started, mode }: { started: boolean; mo
     return () => timers.forEach(clearTimeout);
   }, [mode]);
 
+  // Content inside the screen iframe can scroll this wrapper (scrollIntoView, focus) and push the
+  // whole screen out of view. Pin it.
+  useEffect(() => {
+    if (!started) return;
+    const wrapper = document.querySelector<HTMLElement>('.htmlScreen');
+    if (!wrapper) return;
+    const pin = () => {
+      wrapper.scrollTop = 0;
+      wrapper.scrollLeft = 0;
+    };
+    wrapper.addEventListener('scroll', pin);
+    return () => wrapper.removeEventListener('scroll', pin);
+  }, [started, model, smudgesDataUrl]);
+
   if (!model || !smudgesDataUrl) return null;
 
   return (
