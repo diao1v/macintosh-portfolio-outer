@@ -91,10 +91,11 @@ export default function MacintoshModel({ started, mode }: { started: boolean; mo
       gsap.to(m.emissive, { ...to.emissive, duration: 1.2, delay: on });
       gsap.to(m, { emissiveIntensity: to.emissiveIntensity, duration: 1.2, delay: on });
     });
-    at(SWITCH.boot, () => setScreen('glitch'));
-    at(SWITCH.boot + GLITCH_MS / 2, () => {
+    // The new site must be showing before the collapsed screen is restored, or the old one flashes through the tear.
+    at(SWITCH.boot, () => {
       if (mode === '2084') setOracleMounted(true);
       setSite(mode);
+      setScreen('glitch');
     });
     at(SWITCH.boot + GLITCH_MS, () => setScreen('on'));
     return () => timers.forEach(clearTimeout);
