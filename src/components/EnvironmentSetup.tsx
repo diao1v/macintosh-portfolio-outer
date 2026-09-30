@@ -2,8 +2,10 @@ import { Environment } from '@react-three/drei';
 import { useState, useEffect } from 'react';
 import { preloadedAssets } from '../utils/preload';
 import { Texture } from 'three';
+import type { Mode } from '../types/mode';
 
-export default function EnvironmentSetup() {
+/** Reflections only. The visible sky is driven by SceneLighting so it can go black on cue. */
+export default function EnvironmentSetup({ lit }: { lit: Mode }) {
   const [hdrTexture, setHdrTexture] = useState<Texture | null>(null);
 
   useEffect(() => {
@@ -11,5 +13,5 @@ export default function EnvironmentSetup() {
     preloadedAssets.hdr.then(setHdrTexture);
   }, []);
 
-  return hdrTexture ? <Environment background map={hdrTexture} /> : null;
+  return hdrTexture ? <Environment background={false} map={hdrTexture} environmentIntensity={lit === '1984' ? 1 : 0.05} /> : null;
 }

@@ -5,9 +5,13 @@ import World from './components/World';
 import DeviceDetection from './components/DeviceDetection';
 import { LoadingScreen } from './components/LoadingScreen';
 import HelpIcon from './components/Help/HelpIcon';
+import ModeToggle from './components/ModeToggle';
+import { SWITCH, type Mode } from './types/mode';
 
 function App() {
   const [assetsLoaded, setAssetsLoaded] = useState(false);
+  const [mode, setMode] = useState<Mode>('1984');
+  const [switching, setSwitching] = useState(false);
 
   useEffect(() => {
     allAssetsLoaded.then(() => {
@@ -16,6 +20,13 @@ function App() {
       }, 500);
     });
   }, []);
+
+  const toggle = () => {
+    const next: Mode = mode === '1984' ? '2084' : '1984';
+    setMode(next);
+    setSwitching(true);
+    setTimeout(() => setSwitching(false), SWITCH.done);
+  };
 
   return (
     <DeviceDetection>
@@ -27,10 +38,11 @@ function App() {
           fov: 75,
         }}
       >
-        <World started={assetsLoaded} />
+        <World started={assetsLoaded} mode={mode} />
       </Canvas>
       {!assetsLoaded ? <LoadingScreen /> : null}
       {assetsLoaded ? <HelpIcon position='bottom-right' /> : null}
+      {assetsLoaded ? <ModeToggle mode={mode} disabled={switching} onToggle={toggle} /> : null}
     </DeviceDetection>
   );
 }
